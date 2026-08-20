@@ -1,0 +1,7 @@
+/projects/
+tests/.tmp/
+tests/.tmp-*/
+tests/.tmp-win-*/
+*.partial-*
+.DS_Store
+Thumbs.db
