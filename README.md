@@ -10,16 +10,39 @@ Turn a multi-GB video into a small audio file for Gemini, Whisper, or subtitles 
    winget install Gyan.FFmpeg
    ```
 
-2. Drag a video onto:
+2. Double-click:
 
-   `windows/extract-for-subtitles.bat`
+   `windows\launch-ui.vbs`
 
-3. Get:
+   This opens the B desktop UI without a console window. You can drag a video into the window, choose **Fast Copy**, **Subtitle Ready**, or **Split**, then start extraction. The UI calls the existing batch scripts locally; it does not run a server or upload the source video.
+
+   If Windows Script Host is disabled, use the visible-console fallback:
+
+   `windows\launch-ui.bat`
+
+3. Prefer the original script-only flow? Drag a video directly onto:
+
+   `windows\extract-for-subtitles.bat`
+
+4. Get:
 
    `video.subtitles.mp3`
 
-The output is created next to the source video. No server, account, upload step, Python environment, Node.js install, or application runtime is required.
+The output is created next to the source video. The extraction core still requires only FFmpeg/ffprobe. The optional Windows B UI uses built-in Windows PowerShell/WPF and adds no Node.js, Python, Electron, local server, account, telemetry, or cloud runtime.
 
+### B desktop UI
+
+The native Windows UI keeps the selected B layout while preserving the original product boundary:
+
+- browse or drag-and-drop a local video;
+- switch among all three extraction modes;
+- configure split length from 1 to 1440 minutes;
+- detect whether FFmpeg/ffprobe are available before enabling Start;
+- keep the window responsive while the existing batch script runs in a hidden child process;
+- surface script success/errors and open the output folder when complete;
+- refuse to close the window while an extraction is still running, so the UI does not intentionally hard-kill FFmpeg and leave partial work.
+
+`ui/index.html` remains a browser-safe design/reference build of B. Browsers cannot obtain the real local file path and launch FFmpeg safely, so the executable Windows path is the native WPF launcher above rather than a local HTTP bridge.
 ## Modes
 
 | Mode | Use case | Re-encode | Output |
@@ -159,6 +182,9 @@ On Windows:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tests\smoke-windows.ps1
+
+# Optional B desktop UI / native bridge probe
+powershell -ExecutionPolicy Bypass -File tests\ui-windows-probe.ps1
 ```
 
 The tests cover AAC/MP4, Opus/MKV, no-audio input, spaces, Unicode paths, existing-output protection, FAST stream copy, subtitle audio properties, and segmented output.

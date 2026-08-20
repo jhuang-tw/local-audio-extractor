@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  smoke:
+  smoke-posix:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,3 +15,21 @@ jobs:
           sudo apt-get install -y ffmpeg
       - name: Run focused smoke acceptance
         run: bash tests/smoke.sh
+
+  smoke-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure FFmpeg
+        shell: powershell
+        run: |
+          if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+            choco install ffmpeg -y --no-progress
+          }
+          ffmpeg -version | Select-Object -First 1
+      - name: Run Windows extraction smoke acceptance
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File tests\smoke-windows.ps1
+      - name: Probe B desktop UI and native bridge
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File tests\ui-windows-probe.ps1

@@ -1,4 +1,5 @@
 /projects/
+/ui-prototypes/
 tests/.tmp/
 tests/.tmp-*/
 tests/.tmp-win-*/
